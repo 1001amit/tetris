@@ -69,3 +69,35 @@ class Tetris:
                 ):
                     return True
         return False
+
+    def place_piece(self):
+        for y, row in enumerate(self.current_piece['shape']):
+            for x, cell in enumerate(row):
+                if cell:
+                    self.grid[y + self.piece_pos[0]][x + self.piece_pos[1]] = self.current_piece['color']
+        self.clear_lines()
+        self.current_piece = self.next_piece
+        self.next_piece = self.new_piece()
+        self.piece_pos = [0, 3]
+        if self.check_collision(self.current_piece['shape'], self.piece_pos):
+            self.game_over = True
+
+    def clear_lines(self):
+        lines_to_clear = [i for i, row in enumerate(self.grid) if all(cell != BLACK for cell in row)]
+        for i in lines_to_clear:
+            del self.grid[i]
+            self.grid.insert(0, [BLACK for _ in range(SCREEN_WIDTH // BLOCK_SIZE)])
+        self.score += len(lines_to_clear) * 10
+        self.level = self.score // 100 + 1
+
+    def move_piece(self, dx):
+        new_pos = [self.piece_pos[0], self.piece_pos[1] + dx]
+        if not self.check_collision(self.current_piece['shape'], new_pos):
+            self.piece_pos = new_pos
+
+    def drop_piece(self):
+        new_pos = [self.piece_pos[0] + 1, self.piece_pos[1]]
+        if self.check_collision(self.current_piece['shape'], new_pos):
+            self.place_piece()
+        else:
+            self.piece_pos = new_pos
