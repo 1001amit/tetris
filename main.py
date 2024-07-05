@@ -51,3 +51,21 @@ class Tetris:
         shape = random.choice(SHAPES)
         color = SHAPE_COLORS[SHAPES.index(shape)]
         return {'shape': shape, 'color': color}
+
+    def rotate_piece(self):
+        shape = self.current_piece['shape']
+        rotated_shape = [[shape[y][x] for y in range(len(shape))] for x in range(len(shape[0]) - 1, -1, -1)]
+        if not self.check_collision(rotated_shape, self.piece_pos):
+            self.current_piece['shape'] = rotated_shape
+
+    def check_collision(self, shape, pos):
+        for y, row in enumerate(shape):
+            for x, cell in enumerate(row):
+                if cell and (
+                    x + pos[1] < 0 or
+                    x + pos[1] >= len(self.grid[0]) or
+                    y + pos[0] >= len(self.grid) or
+                    self.grid[y + pos[0]][x + pos[1]] != BLACK
+                ):
+                    return True
+        return False
