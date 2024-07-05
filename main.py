@@ -101,3 +101,49 @@ class Tetris:
             self.place_piece()
         else:
             self.piece_pos = new_pos
+
+    def draw_grid(self):
+        for y, row in enumerate(self.grid):
+            for x, cell in enumerate(row):
+                pygame.draw.rect(self.screen, cell, pygame.Rect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+
+    def draw_piece(self):
+        for y, row in enumerate(self.current_piece['shape']):
+            for x, cell in enumerate(row):
+                if cell:
+                    pygame.draw.rect(self.screen, self.current_piece['color'], pygame.Rect((self.piece_pos[1] + x) * BLOCK_SIZE, (self.piece_pos[0] + y) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+
+    def draw_next_piece(self):
+        for y, row in enumerate(self.next_piece['shape']):
+            for x, cell in enumerate(row):
+                if cell:
+                    pygame.draw.rect(self.screen, self.next_piece['color'], pygame.Rect((SCREEN_WIDTH // BLOCK_SIZE + 1 + x) * BLOCK_SIZE, (1 + y) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+
+    def run(self):
+        while not self.game_over:
+            self.screen.fill(BLACK)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.game_over = True
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        self.move_piece(-1)
+                    elif event.key == pygame.K_RIGHT:
+                        self.move_piece(1)
+                    elif event.key == pygame.K_DOWN:
+                        self.drop_piece()
+                    elif event.key == pygame.K_UP:
+                        self.rotate_piece()
+
+            self.drop_piece()
+            self.draw_grid()
+            self.draw_piece()
+            self.draw_next_piece()
+            pygame.display.flip()
+            self.clock.tick(5+ self.level)
+
+        pygame.quit()
+
+if __name__ == "__main__":
+    game = Tetris()
+    game.run()
