@@ -46,6 +46,7 @@ class Tetris:
         self.current_piece = self.new_piece()
         self.next_piece = self.new_piece()
         self.piece_pos = [0, 3]
+        self.font = pygame.font.SysFont('Arial', 24)  # Font for rendering text
 
     def new_piece(self):
         shape = random.choice(SHAPES)
@@ -84,11 +85,21 @@ class Tetris:
 
     def clear_lines(self):
         lines_to_clear = [i for i, row in enumerate(self.grid) if all(cell != BLACK for cell in row)]
-        for i in lines_to_clear:
-            del self.grid[i]
-            self.grid.insert(0, [BLACK for _ in range(SCREEN_WIDTH // BLOCK_SIZE)])
-        self.score += len(lines_to_clear) * 10
-        self.level = self.score // 100 + 1
+        if lines_to_clear:
+            for i in lines_to_clear:
+                del self.grid[i]
+                self.grid.insert(0, [BLACK for _ in range(SCREEN_WIDTH // BLOCK_SIZE)])
+            lines_cleared = len(lines_to_clear)
+            
+            if lines_cleared == 1:
+                self.score += 100
+            elif lines_cleared == 2:
+                self.score += 300
+            elif lines_cleared == 3:
+                self.score += 500
+            elif lines_cleared == 4:
+                self.score += 800
+            self.level = self.score // 1000 + 1
 
     def move_piece(self, dx):
         new_pos = [self.piece_pos[0], self.piece_pos[1] + dx]
@@ -119,6 +130,12 @@ class Tetris:
                 if cell:
                     pygame.draw.rect(self.screen, self.next_piece['color'], pygame.Rect((SCREEN_WIDTH // BLOCK_SIZE + 1 + x) * BLOCK_SIZE, (1 + y) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
 
+    def draw_score(self):
+        score_text = self.font.render(f"Score: {self.score}", True, WHITE)
+        level_text = self.font.render(f"Level: {self.level}", True, WHITE)
+        self.screen.blit(score_text, (10, 10))
+        self.screen.blit(level_text, (10, 40))
+
     def run(self):
         while not self.game_over:
             self.screen.fill(BLACK)
@@ -139,6 +156,7 @@ class Tetris:
             self.draw_grid()
             self.draw_piece()
             self.draw_next_piece()
+            self.draw_score()
             pygame.display.flip()
             self.clock.tick(5+ self.level)
 
