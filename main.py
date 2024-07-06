@@ -42,6 +42,7 @@ class Tetris:
         self.grid = [[BLACK for _ in range(SCREEN_WIDTH // BLOCK_SIZE)] for _ in range(SCREEN_HEIGHT // BLOCK_SIZE)]
         self.score = 0
         self.level = 1
+        self.lines_cleared = 0
         self.game_over = False
         self.current_piece = self.new_piece()
         self.next_piece = self.new_piece()
@@ -90,7 +91,7 @@ class Tetris:
                 del self.grid[i]
                 self.grid.insert(0, [BLACK for _ in range(SCREEN_WIDTH // BLOCK_SIZE)])
             lines_cleared = len(lines_to_clear)
-            
+            self.lines_cleared += lines_cleared
             if lines_cleared == 1:
                 self.score += 100
             elif lines_cleared == 2:
@@ -133,8 +134,10 @@ class Tetris:
     def draw_score(self):
         score_text = self.font.render(f"Score: {self.score}", True, WHITE)
         level_text = self.font.render(f"Level: {self.level}", True, WHITE)
+        lines_text = self.font.render(f"Lines: {self.lines_cleared}", True, WHITE)
         self.screen.blit(score_text, (10, 10))
         self.screen.blit(level_text, (10, 40))
+        self.screen.blit(lines_text, (10, 70))
 
     def run(self):
         while not self.game_over:
